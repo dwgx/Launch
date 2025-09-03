@@ -11,7 +11,7 @@ ProcessHandler::~ProcessHandler() {
 
 HANDLE ProcessHandler::OpenProcessHandle() {
     hProcess = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, pid);
-    return hProcess; // 错误处理移到调用处
+    return hProcess;
 }
 
 uintptr_t ProcessHandler::GetModuleBaseAddress(const std::string& moduleName) {

@@ -1,21 +1,21 @@
-#include "gui/gui.h"
+#include "GUI/gui.h"
 #include <iostream>
 #include <Windows.h>
 #include <d3d11.h>
 #include "backends/imgui_impl_dx11.h"
 #include "backends/imgui_impl_win32.h"
-#include "gui/guimain.h"      // 主界面
-#include "gui/guisetting.h"   // 设置界面
+#include "GUI/guimain.h"
+#include "GUI/guisetting.h"
 #include "MemoryManager/MemoryManager.h"
+#define SECURITY_WIN32
+#include <security.h>
 
-// 全局变量定义
 extern ID3D11Device* g_pDevice;
 extern IDXGISwapChain* g_pSwapChain;
 extern ID3D11RenderTargetView* g_pRenderTargetView;
 extern ID3D11DeviceContext* g_pDeviceContext;
 extern HWND g_hwnd;
 
-// ImGui_ImplWin32_WndProcHandler 声明
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 void PrintHResultError(HRESULT hr, const char* operation) {
@@ -66,9 +66,22 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
+bool IsAdmin() {
+    BOOL isAdmin = FALSE;
+    SID_IDENTIFIER_AUTHORITY ntAuth = SECURITY_NT_AUTHORITY;
+    PSID adminGroup;
+    AllocateAndInitializeSid(&ntAuth, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0, &adminGroup);
+    CheckTokenMembership(NULL, adminGroup, &isAdmin);
+    FreeSid(adminGroup);
+    return isAdmin;
+}
+
 int main() {
+    if (!IsAdmin()) {
+        std::cerr << "警告: 请以管理员运行以附加进程！" << std::endl;
+    }
     if (!InitGUI()) {
-        std::cerr << "Gui 初始化失败，程序退出！" << std::endl;
+        std::cerr << "GUI 初始化失败，程序退出！" << std::endl;
         return 1;
     }
 

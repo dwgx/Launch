@@ -14,6 +14,8 @@ public:
     template <typename T>
     bool WriteMemory(LPVOID address, const T& value);
 
+    HANDLE GetHandle() const { return hProcess; }
+
 private:
     HANDLE hProcess;
 };

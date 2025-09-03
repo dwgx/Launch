@@ -5,19 +5,17 @@
 #include "guimain.h"
 #include "guisetting.h"
 #include <iostream>
+#include <filesystem>
 
-// 全局变量定义
 ID3D11Device* g_pDevice = nullptr;
 IDXGISwapChain* g_pSwapChain = nullptr;
 ID3D11RenderTargetView* g_pRenderTargetView = nullptr;
 ID3D11DeviceContext* g_pDeviceContext = nullptr;
 HWND g_hwnd = nullptr;
 
-// ImGui_ImplWin32_WndProcHandler 声明
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 bool InitGUI() {
-    // 注册窗口类
     const char* wndClassName = "MemoryEditor";
     WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, WindowProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, NULL, NULL, wndClassName, NULL };
     if (!RegisterClassEx(&wc)) {
@@ -25,7 +23,6 @@ bool InitGUI() {
         return false;
     }
 
-    // 创建窗口
     g_hwnd = CreateWindow(wndClassName, "Launch", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 640, 480, NULL, NULL, wc.hInstance, NULL);
     if (!g_hwnd) {
         std::cerr << "创建窗口失败: " << GetLastError() << std::endl;
@@ -34,7 +31,6 @@ bool InitGUI() {
     ShowWindow(g_hwnd, SW_SHOWDEFAULT);
     UpdateWindow(g_hwnd);
 
-    // DirectX 初始化
     D3D_FEATURE_LEVEL featureLevel;
     DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
     swapChainDesc.BufferCount = 1;
@@ -65,19 +61,20 @@ bool InitGUI() {
         return false;
     }
 
-    // ImGui 初始化
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-    // 加载字体
     io.Fonts->Clear();
-    ImFont* font = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msyh.ttc", 18.0f, nullptr, io.Fonts->GetGlyphRangesChineseFull());
+    std::filesystem::path fontPath = std::filesystem::path(u8"C:/Windows/Fonts/msyh.ttc");
+    ImFont* font = io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 18.0f, nullptr, io.Fonts->GetGlyphRangesChineseFull());
     if (!font) {
-        font = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/simsun.ttc", 18.0f, nullptr, io.Fonts->GetGlyphRangesChineseFull());
+        fontPath = std::filesystem::path(u8"C:/Windows/Fonts/simsun.ttc");
+        font = io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 18.0f, nullptr, io.Fonts->GetGlyphRangesChineseFull());
         if (!font) {
-            font = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/meiryo.ttc", 18.0f, nullptr, io.Fonts->GetGlyphRangesChineseFull());
+            fontPath = std::filesystem::path(u8"C:/Windows/Fonts/meiryo.ttc");
+            font = io.Fonts->AddFontFromFileTTF(fontPath.string().c_str(), 18.0f, nullptr, io.Fonts->GetGlyphRangesChineseFull());
             if (!font) {
                 io.Fonts->AddFontDefault();
             }
@@ -97,7 +94,7 @@ bool InitGUI() {
 void RenderFrame() {
     ImGui::Render();
     g_pDeviceContext->OMSetRenderTargets(1, &g_pRenderTargetView, nullptr);
-    const float clear_color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };  // 黑色背景
+    const float clear_color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
     g_pDeviceContext->ClearRenderTargetView(g_pRenderTargetView, clear_color);
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
     g_pSwapChain->Present(1, 0);
@@ -118,7 +115,6 @@ void RunGUILoop() {
             ImGui_ImplWin32_NewFrame();
             ImGui::NewFrame();
 
-            // 注册窗口（注册式，便于扩展）
             RegisterMainWindow(memoryManager, processAttached, statusMsg);
             RegisterSettingWindow();
 
