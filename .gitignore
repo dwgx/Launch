@@ -1,0 +1,63 @@
+# CMake
+build/
+out/
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+install_manifest.txt
+Testing/
+compile_commands.json
+CTestTestfile.cmake
+_deps/
+
+# Visual Studio
+.vs/
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# 用户专属文件
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+*.suo
+
+# 编译产物
+*.obj
+*.o
+*.a
+*.lib
+*.exp
+*.pdb
+*.ilk
+*.idb
+*.tlog
+*.exe
+*.dll
+*.so
+*.dylib
+*.out
+
+# Rider / CLion
+.idea/
+cmake-build-*/
+
+# VS Code
+.vscode/
+
+# 系统
+.DS_Store
+Thumbs.db
